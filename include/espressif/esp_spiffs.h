@@ -73,6 +73,14 @@ sint32 esp_spiffs_init(struct esp_spiffs_config *config);
   */
 void esp_spiffs_deinit(uint8 format);
 
+int _open_r(struct _reent *r, const char *filename, int flags, int mode);
+int _close_r(struct _reent *r, int fd);
+_ssize_t _read_r(struct _reent *r, int fd, void *buf, size_t len);
+_ssize_t _write_r(struct _reent *r, int fd, void *buf, size_t len);
+_off_t _lseek_r(struct _reent *r, int fd, _off_t where, int whence);
+int _unlink_r(struct _reent *r, const char *filename);
+spiffs_DIR *_oper_dir(char *name, spiffs_DIR *d);
+int _fsinfo(int data[]);
 /**
   * @}
   */
