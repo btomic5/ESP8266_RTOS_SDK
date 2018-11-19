@@ -21,6 +21,12 @@
 // ----------- >8 ------------
 
 // compile time switches
+#define SPIFFS_SINGLETON 1
+#define SPIFFS_CFG_PHYS_SZ(ignore)        (2048*1024)
+#define SPIFFS_CFG_PHYS_ADDR(ignore)      (1024*1024)
+#define SPIFFS_CFG_LOG_PAGE_SZ(ignore)    (128)
+#define SPIFFS_CFG_PHYS_ERASE_SZ(ignore)  (4*1024)
+#define SPIFFS_CFG_LOG_BLOCK_SZ(ignore)   (4*1024)
 
 // Set generic spiffs debug output call.
 #ifndef SPIFFS_DBG
