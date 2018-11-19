@@ -20,12 +20,12 @@ static s32_t esp_spiffs_readwrite(u32_t addr, u32_t size, u8_t *p, int write)
      * LOG_PAGE_SIZE
      */
 
-    if (size > fs.cfg.log_page_size) {
+    if (size > SPIFFS_CFG_LOG_PAGE_SZ(fs)) {
         printf("Invalid size provided to read/write (%d)\n\r", (int) size);
         return SPIFFS_ERR_NOT_CONFIGURED;
     }
 
-    char tmp_buf[fs.cfg.log_page_size + FLASH_UNIT_SIZE * 2];
+	char tmp_buf[SPIFFS_CFG_LOG_PAGE_SZ(fs) + FLASH_UNIT_SIZE * 2];
     u32_t aligned_addr = addr & (-FLASH_UNIT_SIZE);
     u32_t aligned_size =
         ((size + (FLASH_UNIT_SIZE - 1)) & -FLASH_UNIT_SIZE) + FLASH_UNIT_SIZE;
@@ -72,13 +72,13 @@ static s32_t esp_spiffs_erase(u32_t addr, u32_t size)
      * With proper configurarion spiffs always
      * provides here sector address & sector size
      */
-    if (size != fs.cfg.phys_erase_block || addr % fs.cfg.phys_erase_block != 0) {
+	if (size != SPIFFS_CFG_PHYS_ERASE_SZ(fs) || addr % SPIFFS_CFG_PHYS_ERASE_SZ(fs) != 0) {
         printf("Invalid size provided to esp_spiffs_erase (%d, %d)\n\r",
                (int) addr, (int) size);
         return SPIFFS_ERR_NOT_CONFIGURED;
     }
 
-    return spi_flash_erase_sector(addr / fs.cfg.phys_erase_block);
+	return spi_flash_erase_sector(addr / SPIFFS_CFG_PHYS_ERASE_SZ(fs));
 }
 
 s32_t esp_spiffs_init(struct esp_spiffs_config *config)
@@ -90,11 +90,13 @@ s32_t esp_spiffs_init(struct esp_spiffs_config *config)
     spiffs_config cfg;
     s32_t ret;
 
+#if SPIFFS_SINGLETON == 0
     cfg.phys_size = config->phys_size;
     cfg.phys_addr = config->phys_addr;
     cfg.phys_erase_block = config->phys_erase_block;
     cfg.log_block_size = config->log_block_size;
     cfg.log_page_size = config->log_page_size;
+#endif
 
     cfg.hal_read_f = esp_spiffs_read;
     cfg.hal_write_f = esp_spiffs_write;
@@ -200,6 +202,10 @@ int _open_r(struct _reent *r, const char *filename, int flags, int mode)
     return res;
 }
 
+spiffs_DIR *_oper_dir(char *name, spiffs_DIR *d){
+	return SPIFFS_opendir(&fs, name, d);
+}
+
 _ssize_t _read_r(struct _reent *r, int fd, void *buf, size_t len)
 {
 
@@ -290,3 +296,8 @@ int _fstat_r(struct _reent *r, int fd, struct stat *s)
     s->st_size = ss.size;
     return 0;
 }
+
+int _fsinfo(int data[]){
+	return SPIFFS_info(&fs, &data[0], &data[1]);
+}
+
