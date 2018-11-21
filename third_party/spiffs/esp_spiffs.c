@@ -163,6 +163,10 @@ void esp_spiffs_deinit(u8_t format)
     }
 }
 
+int _get_errno(){
+	return SPIFFS_errno(&fs);
+}
+
 int _open_r(struct _reent *r, const char *filename, int flags, int mode)
 {
     spiffs_mode sm = 0;

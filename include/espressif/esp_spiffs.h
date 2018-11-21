@@ -73,6 +73,7 @@ sint32 esp_spiffs_init(struct esp_spiffs_config *config);
   */
 void esp_spiffs_deinit(uint8 format);
 
+int _get_errno();
 int _open_r(struct _reent *r, const char *filename, int flags, int mode);
 int _close_r(struct _reent *r, int fd);
 _ssize_t _read_r(struct _reent *r, int fd, void *buf, size_t len);
